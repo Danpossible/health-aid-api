@@ -61,7 +61,7 @@ route.post(
 );
 
 route.post(
-  '/Patient/forgot-password',
+  '/forgot-password',
   validate(forgotPasswordValidator),
   (req: Request, res: Response, next: NextFunction) => {
     authController.passwordReset(req, res, next);
