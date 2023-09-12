@@ -13,9 +13,9 @@ import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import AppException from '../exceptions/AppException';
-import { Server } from 'socket.io';
+// import { Server } from 'socket.io';
 import http from 'http';
-import WS, { socketUserMiddleware } from '../utils/ws.config';
+// import WS, { socketUserMiddleware } from '../utils/ws.config';
 
 function getClientIP(req: Request) {
   const header = req.headers['x-forwarded-for'] as string;
@@ -58,16 +58,16 @@ const createServer = async () => {
   app.disable('x-powered-by');
 
   const server = http.createServer(app);
-  const io = new Server(server, {
-    cors: {
-      origin: '*',
-      methods: ['GET', 'POST'],
-      allowedHeaders: ['Content-Type'],
-      credentials: true,
-    },
-  });
-  io.use(socketUserMiddleware);
-  new WS(io);
+  // const io = new Server(server, {
+  //   cors: {
+  //     origin: '*',
+  //     methods: ['GET', 'POST'],
+  //     allowedHeaders: ['Content-Type'],
+  //     credentials: true,
+  //   },
+  // });
+  // io.use(socketUserMiddleware);
+  // new WS(io);
 
   app.get('/', (_req, res) => {
     res.send('<b>Welcome to your App!</b>');
