@@ -32,6 +32,6 @@ COPY . .
 
 COPY --from=development /usr/src/app/build ./build
 
-EXPOSE 8080
+EXPOSE 3456
 
 CMD [ "node", "build/server.js" ]
