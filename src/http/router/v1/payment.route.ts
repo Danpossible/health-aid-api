@@ -6,10 +6,7 @@ import {
   validateAccount,
   inAppTransfer,
   transactionPin,
-  buyAirtime,
   withdrawal,
-  buyData,
-  purchaseUtilities,
 } from '../../../validators/Payment.validation';
 
 const router = Route();
