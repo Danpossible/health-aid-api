@@ -10,7 +10,7 @@ export type RequestType = {
 export const restrictAccessTo =
   (...portfolios: string[]) =>
   (req: RequestType, _res: Response, next: NextFunction) => {
-    if (!portfolios.includes(req.Patient.portfolio)) {
+    if (!portfolios.includes(req.user.portfolio)) {
       return next(
         new AppException(
           `Oops! you don't have the privilege to perform this action`,

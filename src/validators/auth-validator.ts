@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import {
   ADMIN_ROLE,
+  AVAILABILITY,
   GENDER,
   HEALTH_WORKER_TYPE,
   PORTFOLIO,
@@ -190,6 +191,9 @@ export const updatePatientAccount = {
     gender: Joi.string()
       .optional()
       .valid(...Object.values(GENDER)),
+    availability: Joi.string()
+      .optional()
+      .valid(...Object.values(AVAILABILITY)),
   }),
 };
 

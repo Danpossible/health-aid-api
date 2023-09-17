@@ -9,6 +9,7 @@ import {
   PORTFOLIO,
   ACCOUNT_STATUS,
   HEALTH_WORKER_TYPE,
+  AVAILABILITY,
 } from '../../../config/constants';
 import auditableFields from '../plugins/auditableFields.plugin';
 import { HealthWorker } from '../../../index';
@@ -66,6 +67,7 @@ const HealthWorkerSchema = new Schema<HealthWorker>(
       required: false,
       trim: true,
     },
+    availability: { type: String, enum: Object.values(AVAILABILITY) },
     verifiedAt: Date,
     verificationToken: String,
     verificationTokenExpiry: Date,

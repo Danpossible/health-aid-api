@@ -5,6 +5,7 @@ import {
   ACCOUNT_STATUS,
   NOTIFICATION_TYPES,
   HEALTH_WORKER_TYPE,
+  AVAILABILITY,
 } from './config/constants';
 interface PaginationOptions {
   populate?: string;
@@ -163,6 +164,7 @@ interface HealthWorker extends AuditableFields {
   password: string;
   portfolio: PORTFOLIO;
   healthWorkerType?: HEALTH_WORKER_TYPE;
+  availability?: AVAILABILITY;
   verifiedAt: Date;
   verificationToken: string;
   verificationTokenExpiry: Date;
