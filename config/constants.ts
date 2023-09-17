@@ -172,6 +172,13 @@ export enum NOTIFICATION_TYPES {
   TRANSACTION_NOTIFICATION = 'transaction_notification',
 }
 
+export enum AVAILABILITY {
+  AVAILABLE_IN_PERSON = 'available_in_person',
+  AVAILABLE_REMOTE = 'available_remote',
+  AVAILABLE_IN_PERSON_AND_REMOTE = 'available_in_person_and_remote',
+  OFFLINE = 'offline',
+}
+
 export enum ADMIN_ROLE {
   SUPER_ADMIN = 'super_admin',
   SUB_ADMIN = 'sub_admin',
