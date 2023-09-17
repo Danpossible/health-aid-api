@@ -16,6 +16,7 @@ export const authController = new PatientAuth(
   new UserService(),
   new EncryptionService(),
   new EmailService(),
+  new TokenService(),
 );
 
 export const adminAuthController = new AdminAuth(
@@ -25,5 +26,5 @@ export const adminAuthController = new AdminAuth(
     new EmailService(),
   ),
   new AdminService(),
-  new EncryptionService(),
+  new EncryptionService(),new TokenService(),
 );

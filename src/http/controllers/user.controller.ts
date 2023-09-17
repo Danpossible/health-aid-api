@@ -48,7 +48,7 @@ export default class UserController {
         me = await this.userService.getOne(HealthWorker, {
           _id: req.user.id,
         });
-        if (!me) throw new Error('Patient not found');
+        if (!me) throw new Error('User not found');
       }
 
       return res.status(httpStatus.OK).json({

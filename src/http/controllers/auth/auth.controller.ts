@@ -12,6 +12,8 @@ import Patient from '../../../database/models/patient.model';
 import HealthWorker from '../../../database/models/health_worker.model';
 import EmailService from '../../../services/email.service';
 import UserService from '../../../services/patient.service';
+import TokenService from '../../../services/token.service';
+import { JwtPayload } from 'jsonwebtoken';
 // const sendChamp = new SendChamp({
 //   mode: config.sendChamp.mode,
 //   publicKey: config.sendChamp.apiKey,
@@ -22,6 +24,7 @@ export default class PatientAuth {
     private readonly userService: UserService,
     private readonly encryptionService: EncryptionService,
     private readonly emailService: EmailService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async create(req: Request, res: Response, next: NextFunction) {
@@ -144,7 +147,7 @@ export default class PatientAuth {
         user = await HealthWorker.findOne({
           email: req.body.email,
         }).select('+password');
-        if (!Patient) throw new Error('Oops! invalid login credentials');
+        if (!user) throw new Error('Oops! invalid login credentials');
       }
       if (
         !(await this.encryptionService.comparePassword(
@@ -157,7 +160,7 @@ export default class PatientAuth {
       if (user.accountStatus.status !== ACCOUNT_STATUS.CONFIRMED)
         throw Error('Oops! account is not verified');
       const token = await this.authService.login(
-        Patient as unknown as { [key: string]: string },
+        user as unknown as { [key: string]: string },
       );
 
       user.portfolio === PORTFOLIO.PATIENT
@@ -180,11 +183,21 @@ export default class PatientAuth {
 
   async regenerateAccessToken(req: Request, res: Response, next: NextFunction) {
     try {
-      // const Patient = await this.
-      const accessToken = await this.authService.regenerateAccessToken<Patient>(
+      const decodeToken = await this.tokenService.verifyToken(
         req.body.refreshToken,
-        Patient,
       );
+      const { sub }: string | JwtPayload = decodeToken;
+      let user = await this.userService.getPatientById(sub as string);
+      if (!user) {
+        user = await this.userService.getOne(HealthWorker, {
+          _id: sub as string,
+        });
+        if (!user) throw new Error(`Oops!, user does not exist`);
+      }
+      const accessToken = await this.authService.regenerateAccessToken({
+        email: user.email,
+        id: user.id,
+      });
       if (!accessToken || accessToken.trim() === '')
         return next(
           new AppException(
@@ -228,28 +241,34 @@ export default class PatientAuth {
       // req.body.phoneNumber = req.body.phoneNumber.startsWith('+234')
       //   ? req.body.phoneNumber
       //   : `+234${req.body.phoneNumber.replace(/^0+/, '')}`;
-      let patient = await Patient.findOne({
+      let user = await Patient.findOne({
         email: req.body.email,
       });
-      if (!patient) {
-        patient = await HealthWorker.findOne({
+      if (!user) {
+        user = await HealthWorker.findOne({
           email: req.body.email,
         });
       }
-      if (!patient) throw new Error('Oops! Patient does not exist');
-      if (patient.accountStatus.status === ACCOUNT_STATUS.CONFIRMED)
+      if (!user) throw new Error('Oops! user does not exist');
+      if (user.accountStatus.status === ACCOUNT_STATUS.CONFIRMED)
         throw new Error(`Oops!, account has already been verified`);
       const otp = HelperClass.generateRandomChar(6, 'num');
       const hashedToken = await this.encryptionService.hashString(otp);
 
-      const updateBody: Pick<
-        Patient,
-        'verificationToken' | 'verificationTokenExpiry'
-      > = {
-        verificationToken: hashedToken,
-        verificationTokenExpiry: moment().add('10', 'minutes').utc().toDate(),
-      };
-      await this.userService.updatePatientById(patient.id, updateBody);
+      // const updateBody: Pick<
+      //   Patient | HealthWorker,
+      //   'verificationToken' | 'verificationTokenExpiry'
+      // > = {
+      //   verificationToken: hashedToken,
+      //   verificationTokenExpiry: moment().add('10', 'minutes').utc().toDate(),
+      // };
+      user.verificationToken = hashedToken;
+      user.verificationTokenExpiry = moment()
+        .add('10', 'minutes')
+        .utc()
+        .toDate();
+      await user.save();
+      // await this.userService.updatePatientById(user.id, updateBody);
       // await this.sendOtp({
       //   phoneNumber: Patient.phoneNumber,
       //   firstName: Patient.firstName,
@@ -257,13 +276,13 @@ export default class PatientAuth {
       //   otp,
       // });
       await this.emailService._sendPatientEmailVerificationEmail(
-        `${HelperClass.upperCase(patient.lastName)} ${patient.firstName}`,
-        patient.email,
+        `${HelperClass.upperCase(user.lastName)} ${user.firstName}`,
+        user.email,
         otp,
       );
       return res.status(httpStatus.OK).json({
         status: 'success',
-        message: 'OTP sent successfully, please check your phone number',
+        message: 'OTP sent successfully, please check your email',
       });
     } catch (err: unknown) {
       if (err instanceof AppException || err instanceof Error) {
@@ -275,29 +294,29 @@ export default class PatientAuth {
   async verifyOtp(req: Request, res: Response, next: NextFunction) {
     try {
       const hashedOtp = await this.encryptionService.hashString(req.body.otp);
-      let patient = await Patient.findOne({
+      let user = await Patient.findOne({
         verificationToken: hashedOtp,
       });
-      if (!patient) {
-        patient = await HealthWorker.findOne({
+      if (!user) {
+        user = await HealthWorker.findOne({
           verificationToken: hashedOtp,
         });
       }
-      if (!patient) throw new Error('Oops! Patient does not exist');
-      if (patient.verificationTokenExpiry < new Date())
+      if (!user) throw new Error('Oops! Patient does not exist');
+      if (user.verificationTokenExpiry < new Date())
         throw new Error('Oops!, otp has expired');
-      patient.verificationToken = null;
-      patient.verificationTokenExpiry = null;
-      patient.save();
+      user.verificationToken = null;
+      user.verificationTokenExpiry = null;
+      user.save();
       const token = await this.authService.login(
         Patient as unknown as { [key: string]: string },
       );
-      await this.userService.updatePatientById(patient.id, {
+      await this.userService.updatePatientById(user.id, {
         pushNotificationId: req.body.pushNotificationId,
       });
       return res.status(httpStatus.OK).json({
         status: 'success',
-        Patient: Patient,
+        user: user,
         token,
       });
     } catch (err: unknown) {

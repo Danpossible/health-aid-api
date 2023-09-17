@@ -13,6 +13,8 @@ import AdminService from '../../../services/admin.service';
 import EncryptionService from '../../../services/encryption.service';
 import Admin from '../../../database/models/admin.model';
 import SendChamp from '../../../services/sendchamp/index';
+import { JwtPayload } from 'jsonwebtoken';
+import TokenService from '../../../services/token.service';
 const sendChamp = new SendChamp({
   mode: config.sendChamp.mode,
   publicKey: config.sendChamp.apiKey,
@@ -23,7 +25,8 @@ export default class AdminAuth {
   constructor(
     private readonly authService: AuthService,
     private readonly adminService: AdminService,
-    private readonly encryptionService: EncryptionService, // private readonly CaesarService: CaesarService,
+    private readonly encryptionService: EncryptionService,
+    private readonly tokenService: TokenService,
   ) {}
 
   async create(req: Request, res: Response, next: NextFunction) {
@@ -115,10 +118,17 @@ export default class AdminAuth {
 
   async regenerateAccessToken(req: Request, res: Response, next: NextFunction) {
     try {
-      const accessToken = await this.authService.regenerateAccessToken<Admin>(
+      const decodeToken = await this.tokenService.verifyToken(
         req.body.refreshToken,
-        Admin,
       );
+      const { sub }: string | JwtPayload = decodeToken;
+      const admin = await this.adminService.getOne(Admin, {
+        id: sub as string,
+      });
+      const accessToken = await this.authService.regenerateAccessToken({
+        id: admin.id,
+        email: admin.email,
+      });
       if (!accessToken || accessToken.trim() === '')
         return next(
           new AppException(

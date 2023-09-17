@@ -2,7 +2,6 @@
 
 import HelperClass from '../utils/helper';
 import moment from 'moment';
-import { JwtPayload } from 'jsonwebtoken';
 import { Model } from 'mongoose';
 import EncryptionService from './encryption.service';
 import TokenService from './token.service';
@@ -29,16 +28,9 @@ export default class AuthService {
     return token;
   }
 
-  async regenerateAccessToken<T>(
-    refreshToken: string,
-    model: Model<T, any>,
-  ): Promise<string> {
-    const decodeToken = await new TokenService().verifyToken(refreshToken);
-    const { sub }: string | JwtPayload = decodeToken;
-    const data = await model.findById(sub);
-
-    if (!data) throw new Error(`Oops!, data with id ${sub} does not exist`);
-
+  async regenerateAccessToken(data: {
+    [key: string]: string;
+  }): Promise<string> {
     const { accessToken } = await this.tokenService.generateToken(
       data.id,
       data.email,
