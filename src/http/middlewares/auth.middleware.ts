@@ -46,10 +46,7 @@ export const isUserAuthenticated = async (
       user = await new UserService().getOne(HealthWorker, { _id: sub });
       if (!user)
         return next(
-          new AppException(
-            'Oops!, Patient does not exist',
-            httpStatus.NOT_FOUND,
-          ),
+          new AppException('Oops!, user does not exist', httpStatus.NOT_FOUND),
         );
     }
 
