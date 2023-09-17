@@ -7,7 +7,7 @@ const envVarsSchema = Joi.object()
     NODE_ENV: Joi.string()
       .required()
       .valid('development', 'production', 'staging', 'test'),
-    ENVIROMENT: Joi.string()
+    ENVIRONMENT: Joi.string()
       .required()
       .valid('development', 'production', 'staging', 'test'),
     PORT: Joi.number().default(8080).required(),
@@ -58,7 +58,7 @@ if (error) {
 
 export default {
   env: envVars.NODE_ENV,
-  enviroment: envVars.ENVIROMENT,
+  environment: envVars.ENVIRONMENT,
   DATABASE_URL: envVars.DATABASE_URL,
   port: envVars.PORT,
   appName: envVars.APP_NAME,
@@ -89,5 +89,17 @@ export default {
     cloudName: envVars.CLOUDINARY_NAME,
     apiKey: envVars.CLOUDINARY_API_KEY,
     apiSecret: envVars.CLOUDINARY_API_SECRET,
+  },
+  paymentData: {
+    paga_secret: envVars.PAGA_API_SECRET,
+    paga_key: envVars.PAGA_API_KEY,
+    paga_public_key: envVars.PAGA_API_PUBLIC_KEY,
+    paga_url: envVars.PAGA_API_URL,
+    withdrawalFee: envVars.WITHDRAWAL_FEE,
+    isPagaTestEnv: envVars.PAGA_TEST_ENVIRONMENT,
+    pagaAuthorizationKey: envVars.PAGA_AUTHORIZATION_KEY,
+    depositCharge: envVars.DEPOSIT_CHARGE,
+    withdrawalProcessingCost: envVars.WITHDRAWAL_PROCESSING_COST,
+    withdrawalCharge: envVars.WITHDRAWAL_CHARGE,
   },
 };

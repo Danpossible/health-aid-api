@@ -14,10 +14,96 @@ interface PaginationOptions {
   page?: string;
 }
 
+export interface BankInterface {
+  id: string;
+  name: string;
+  sortCode: string;
+  uuid: string;
+  interInstitutionCode: string;
+  createdAt: Date;
+  updatedAt: Date;
+  deletedAt: Date;
+}
+
+export type ErrorTracker = {
+  id: string;
+  stackTrace: Map;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+};
+interface RegulateTransaction {
+  id: string;
+  idempotentKey: string;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+}
+
+interface HealthAidEarnings extends AuditableFields {
+  id: string;
+  user: User | string;
+  driver: Driver | string;
+  for: PORTFOLIO;
+  amount: number;
+  charge: number;
+  source: string;
+  profit: number;
+  amountSpent: number;
+  transaction: TransactionLogInterface | string | null;
+  earningsIn: 'kuda' | 'flutterwave' | 'paga';
+}
+
+interface TransactionLog extends AuditableFields {
+  id: string;
+  patient: Patient | string;
+  healthWorker: HealthWorker | string;
+  for: PORTFOLIO;
+  amount: number;
+  balanceAfterTransaction: number;
+  transactionDump: TransactionDump | string | null;
+  type: TRANSACTION_TYPES;
+  category: string | null;
+  source: TRANSACTION_SOURCES;
+  reference: string | null;
+  purpose: string | null;
+  meta: object | null;
+  pending: boolean | null;
+  status: TRANSACTION_STATUS;
+  locked: boolean | null;
+  createdAt: Date;
+  updatedAt: Date | null;
+  deletedAt: Date | null;
+  fees: number | null;
+}
+
 interface Waitlist extends AuditableFields {
   id: string;
   _id: string;
   email: string;
+}
+
+interface CheckAccountBalanceRequest {
+  referenceNumber: string;
+  accountPrincipal: string;
+  accountCredentials: string;
+  sourceOfFunds: string;
+  locale: string;
+}
+
+interface PagaBaseResponse {
+  error: boolean;
+  responseCode?: string;
+  statusCode?: string;
+}
+
+interface CheckAccountBalanceResponse extends PagaBaseResponse {
+  referenceNumber: string;
+  message: string;
+  totalBalance: string;
+  availableBalance: number;
+  currency: null;
+  balanceDateTimeUTC: null;
 }
 
 interface PaginationModel<T> {
@@ -36,27 +122,23 @@ interface Patient extends AuditableFields {
   email: string;
   password: string;
   portfolio: PORTFOLIO;
-  residentialAddress: string;
+  residentialAddress?: string;
   verifiedAt: Date;
   verificationToken: string;
   verificationTokenExpiry: Date;
-  passwordResetToken: string;
-  passwordResetTokenExpiresAt: Date;
+  resetToken: string;
+  resetTokenExpiresAt: Date;
   pushNotificationId: string;
   allowPushNotification: boolean;
   appVersion?: string;
-  gender: GENDER;
-  otpLogin: string;
+  gender?: GENDER;
   phoneNumber: string;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date;
   avatar: {
     url: string;
     publicId: string;
   };
   systemCode: string;
-  dob: Date;
+  dob?: Date;
   deviceInfo: typeof Map;
   referralCode: string;
   inviteCode: string;
@@ -64,20 +146,11 @@ interface Patient extends AuditableFields {
     status: ACCOUNT_STATUS;
     reason: string;
   };
-  location: {
+  location?: {
     latitude: number;
     longitude: number;
     state?: string;
     country?: string;
-  };
-  subscription?: Subscription | string;
-  kyc: {
-    meansOfIdentification: string;
-    identificationNumber: string;
-    identificationImage: {
-      url: string;
-      publicId: string;
-    };
   };
 }
 interface HealthWorker extends AuditableFields {
@@ -89,16 +162,16 @@ interface HealthWorker extends AuditableFields {
   email: string;
   password: string;
   portfolio: PORTFOLIO;
-  healthWorkerType: HEALTH_WORKER_TYPE;
+  healthWorkerType?: HEALTH_WORKER_TYPE;
   verifiedAt: Date;
   verificationToken: string;
   verificationTokenExpiry: Date;
-  passwordResetToken: string;
-  passwordResetTokenExpiresAt: Date;
+  resetToken: string;
+  resetTokenExpiresAt: Date;
   pushNotificationId: string;
   allowPushNotification: boolean;
   appVersion?: string;
-  gender: GENDER;
+  gender?: GENDER;
   systemCode: string;
   phoneNumber: string;
   avatar: {
@@ -113,16 +186,16 @@ interface HealthWorker extends AuditableFields {
     reason: string;
   };
   lastLogin?: Date;
-  specialization: string[];
-  experience: string[];
-  location: {
+  specialization?: string[];
+  experience?: string[];
+  location?: {
     latitude: number;
     longitude: number;
     state?: string;
     country?: string;
     address?: string;
   };
-  kyc: {
+  kyc?: {
     driversLicense: {
       number: number;
       image: {
@@ -162,8 +235,8 @@ export interface Admin extends AuditableFields {
   emailVerifiedAt: Date;
   emailVerificationToken: string;
   emailVerificationTokenExpiry: Date;
-  passwordResetToken: string;
-  passwordResetTokenExpiresAt: Date;
+  resetToken: string;
+  resetTokenExpiresAt: Date;
   accountStatus: {
     status: ACCOUNT_STATUS;
     reason: string;
@@ -172,7 +245,7 @@ export interface Admin extends AuditableFields {
   };
   role: ADMIN_ROLE;
   phoneNumber: string;
-  rssn: string;
+  walletNumber: string;
   avatar: {
     url: string;
     publicId: string;
@@ -386,4 +459,86 @@ interface VerifyOtpResponseData {
   updated_at: string;
   verification_reference: string;
   meta_data: unknown;
+}
+
+interface Wallet extends AuditableFields {
+  patient: Patient | string;
+  healthWorker: HealthWorker | string;
+  walletFor: PORTFOLIO;
+  id: string;
+  walletNumber: string;
+  transactionPin: string;
+  walletName: string;
+  bankName: string;
+  availableBalance: number;
+  balance: {
+    available: number;
+    ledger: number;
+  };
+  walletNumber: string;
+  locked: boolean;
+  walletName: string;
+  bankName: string;
+  bankReferenceNumber: string;
+  walletReference: string;
+  stash: string;
+  callbackUrl: string;
+  __v: number;
+  systemCode: string;
+}
+
+interface PagaResponse extends PagaBaseResponse {
+  [key: string]: string;
+}
+
+interface RegisterPersistentPaymentAccount {
+  referenceNumber: string;
+  phoneNumber: string;
+  firstName: string;
+  lastName?: string;
+  accountName: string;
+  financialIdentificationNumber?: string;
+  walletReference: string;
+  creditBankId?: string | null;
+  creditBankAccountNumber?: string | null;
+  callbackUrl: string | null;
+  user?: string | null;
+  currency: string;
+}
+
+interface InAppTransfer {
+  narration: string;
+  amount: number;
+  idempotentKey: string;
+  walletNumber: string;
+  purpose: string;
+}
+
+export interface purchaseUtilitiesType extends PagaBaseResponse {
+  merchant: string;
+  merchantNumber: string;
+  amount: string;
+  merchantServiceProductCode: string;
+  utilityType: string;
+}
+
+interface Notification {
+  id: string;
+  user: User | string;
+  driver: Driver | string;
+  title: string;
+  meta: Map;
+  message: string;
+  read: boolean;
+  for: PORTFOLIO;
+  type: NOTIFICATION_TYPES;
+  priority: number;
+}
+
+interface TransactionDump extends AuditableFields {
+  id: string;
+  data: object;
+  user: User | string;
+  driver: Driver | string;
+  type: TRANSACTION_DUMP_TYPES;
 }

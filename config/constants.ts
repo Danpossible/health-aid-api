@@ -52,7 +52,7 @@ export enum TRANSACTION_SOURCES {
   STASH = 'stash',
   REVERSAL = 'reversal',
   SUBSCRIPTION = 'subscription',
-  Patient_TRANSFER = 'Patient_transfer',
+  USER_TRANSFER = 'user_transfer',
   REFERRAL_BONUS = 'referral_bonus',
 }
 
@@ -169,23 +169,7 @@ export enum PAID_WITH {
 }
 
 export enum NOTIFICATION_TYPES {
-  RIDE_REQUEST = 'ride_request',
-  RIDE_ACCEPTED = 'ride_accepted',
-  RIDE_STARTED = 'ride_started',
-  RIDE_COMPLETED = 'ride_completed',
-  RIDE_CANCELLED = 'ride_cancelled',
-  RIDE_ARRIVED = 'ride_arrived',
-  RIDE_HAILING = 'ride_hailing',
-  RIDE_HAILING_CANCELLED = 'ride_hailing_cancelled',
-  RIDE_HAILING_ACCEPTED = 'ride_hailing_accepted',
-  RIDE_HAILING_STARTED = 'ride_hailing_started',
-  RIDE_HAILING_ARRIVED = 'ride_hailing_arrived',
-  RIDE_HAILING_COMPLETED = 'ride_hailing_completed',
   TRANSACTION_NOTIFICATION = 'transaction_notification',
-  RIDE_REMINDER = 'ride_reminder',
-  SUBSCRIPTION_REMINDER = 'subscription_reminder',
-  GROUP_SUBSCRIPTION_REQUEST = 'group_subscription_request',
-  GROUP_SUBSCRIPTION_ACCEPTED = 'group_subscription_accepted',
 }
 
 export enum ADMIN_ROLE {

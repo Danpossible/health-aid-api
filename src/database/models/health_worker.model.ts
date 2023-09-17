@@ -69,8 +69,8 @@ const HealthWorkerSchema = new Schema<HealthWorker>(
     verifiedAt: Date,
     verificationToken: String,
     verificationTokenExpiry: Date,
-    passwordResetToken: String,
-    passwordResetTokenExpiresAt: Date,
+    resetToken: String,
+    resetTokenExpiresAt: Date,
     pushNotificationId: String,
     allowPushNotification: {
       type: Boolean,
@@ -144,8 +144,8 @@ const HealthWorkerSchema = new Schema<HealthWorker>(
       virtuals: true,
       transform: function (_doc, ret) {
         delete ret._id;
-        delete ret.passwordResetToken;
-        delete ret.passwordResetTokenExpiresAt;
+        delete ret.resetToken;
+        delete ret.resetTokenExpiresAt;
         delete ret.__v;
         delete ret.password;
         delete ret.emailVerificationTokenExpiry;

@@ -165,4 +165,14 @@ export default class EmailService {
       password,
     });
   }
+  async sendTxPinResetEmail(
+    fullName: string,
+    email: string,
+    token: string,
+  ): Promise<void> {
+    return await this._sendMail('SEND_TX_PIN_RESET', email, {
+      fullName,
+      token,
+    });
+  }
 }

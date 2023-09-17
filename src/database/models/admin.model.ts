@@ -37,8 +37,8 @@ const adminSchema = new Schema<Admin>(
     emailVerifiedAt: Date,
     emailVerificationToken: String,
     emailVerificationTokenExpiry: Date,
-    passwordResetToken: String,
-    passwordResetTokenExpiresAt: Date,
+    resetToken: String,
+    resetTokenExpiresAt: Date,
     role: {
       type: String,
       enum: Object.values(ADMIN_ROLE),
@@ -76,8 +76,8 @@ const adminSchema = new Schema<Admin>(
       virtuals: true,
       transform: function (_doc, ret) {
         delete ret._id;
-        delete ret.passwordResetToken;
-        delete ret.passwordResetTokenExpiresAt;
+        delete ret.resetToken;
+        delete ret.resetTokenExpiresAt;
         delete ret.__v;
         delete ret.password;
         delete ret.emailVerificationTokenExpiry;
