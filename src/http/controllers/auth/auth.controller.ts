@@ -324,15 +324,12 @@ export default class PatientAuth {
       if (!user) throw new Error('Oops! Patient does not exist');
       const otp = HelperClass.generateRandomChar(6, 'num');
       const hashedToken = await this.encryptionService.hashString(otp);
-      const updateBody: Pick<
-        Patient,
-        'passwordResetToken' | 'passwordResetTokenExpiresAt'
-      > = {
-        passwordResetToken: hashedToken,
-        passwordResetTokenExpiresAt: moment().add(10, 'minutes').utc().toDate(),
+      const updateBody: Pick<Patient, 'resetToken' | 'resetTokenExpiresAt'> = {
+        resetToken: hashedToken,
+        resetTokenExpiresAt: moment().add(10, 'minutes').utc().toDate(),
       };
       await this.userService.updatePatientById(user.id, updateBody);
-      // if (config.enviroment === 'production') {
+      // if (config.environment === 'production') {
       //   await this.sendOtp({
       //     phoneNumber: Patient.phoneNumber,
       //     firstName: Patient.firstName,
@@ -362,26 +359,26 @@ export default class PatientAuth {
       );
       let user: Patient | HealthWorker;
       user = await this.userService.getPatientDetail({
-        passwordResetToken: hashedToken,
+        resetToken: hashedToken,
       });
       if (!user) {
         user = await this.userService.getOne(HealthWorker, {
-          passwordResetToken: hashedToken,
+          resetToken: hashedToken,
         });
       }
       if (!user) throw new Error(`Oops!, invalid otp`);
-      if (user.passwordResetTokenExpiresAt < moment().utc().toDate())
+      if (user.resetTokenExpiresAt < moment().utc().toDate())
         throw new Error(`Oops!, your token has expired`);
       const hashedPassword = await this.encryptionService.hashPassword(
         req.body.password,
       );
       const updateBody: Pick<
         Patient,
-        'password' | 'passwordResetToken' | 'passwordResetTokenExpiresAt'
+        'password' | 'resetToken' | 'resetTokenExpiresAt'
       > = {
         password: hashedPassword,
-        passwordResetToken: null,
-        passwordResetTokenExpiresAt: null,
+        resetToken: null,
+        resetTokenExpiresAt: null,
       };
 
       user.portfolio === PORTFOLIO.PATIENT

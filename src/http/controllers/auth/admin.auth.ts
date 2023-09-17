@@ -164,12 +164,9 @@ export default class AdminAuth {
       const token = HelperClass.generateRandomChar(6, 'num');
       const hashedToken = await this.encryptionService.hashString(token);
 
-      const updateBody: Pick<
-        Admin,
-        'passwordResetToken' | 'passwordResetTokenExpiresAt'
-      > = {
-        passwordResetToken: hashedToken,
-        passwordResetTokenExpiresAt: moment().add(12, 'hours').utc().toDate(),
+      const updateBody: Pick<Admin, 'resetToken' | 'resetTokenExpiresAt'> = {
+        resetToken: hashedToken,
+        resetTokenExpiresAt: moment().add(12, 'hours').utc().toDate(),
       };
 
       await this.adminService.update<Admin>(
@@ -213,12 +210,9 @@ export default class AdminAuth {
       const otp = HelperClass.generateRandomChar(6, 'num');
       const hashedToken = await this.encryptionService.hashString(otp);
 
-      const updateBody: Pick<
-        Admin,
-        'passwordResetToken' | 'passwordResetTokenExpiresAt'
-      > = {
-        passwordResetToken: hashedToken,
-        passwordResetTokenExpiresAt: moment().add(12, 'hours').utc().toDate(),
+      const updateBody: Pick<Admin, 'resetToken' | 'resetTokenExpiresAt'> = {
+        resetToken: hashedToken,
+        resetTokenExpiresAt: moment().add(12, 'hours').utc().toDate(),
       };
 
       await this.adminService.update<Admin>(Admin, adminExists.id, updateBody);
@@ -266,21 +260,21 @@ export default class AdminAuth {
         req.body.token,
       );
       const admin: Admin = await this.adminService.getOne<Admin>(Admin, {
-        passwordResetToken: hashedToken,
+        resetToken: hashedToken,
       });
       if (!admin) throw new Error(`Oops!, invalid otp`);
-      if (admin.passwordResetTokenExpiresAt < moment().utc().toDate())
+      if (admin.resetTokenExpiresAt < moment().utc().toDate())
         throw new Error(`Oops!, your token has expired`);
       const hashedPassword = await this.encryptionService.hashPassword(
         req.body.password,
       );
       const updateBody: Pick<
         Admin,
-        'password' | 'passwordResetToken' | 'passwordResetTokenExpiresAt'
+        'password' | 'resetToken' | 'resetTokenExpiresAt'
       > = {
         password: hashedPassword,
-        passwordResetToken: null,
-        passwordResetTokenExpiresAt: null,
+        resetToken: null,
+        resetTokenExpiresAt: null,
       };
       await this.adminService.update<Admin>(
         Admin,
