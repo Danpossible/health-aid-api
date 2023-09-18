@@ -83,10 +83,7 @@ const HealthWorkerSchema = new Schema<HealthWorker>(
       type: String,
       enum: Object.values(GENDER),
     },
-    avatar: {
-      url: String,
-      publicId: String,
-    },
+    avatar: String,
     referralCode: String,
     inviteCode: String,
     deviceInfo: [Map],

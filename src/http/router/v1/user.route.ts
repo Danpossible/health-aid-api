@@ -3,7 +3,6 @@ import { userController } from '../../controllers/controllers.module';
 import { isUserAuthenticated } from '../../middlewares/auth.middleware';
 import validate from '../../middlewares/validate';
 import { updatePatientAccount } from '../../../validators/auth-validator';
-import upload from '../../../utils/multer.config';
 import { updateKyc } from '../../../validators/health_worker.validator';
 import { restrictAccessTo } from '../../middlewares/role.middleware';
 import { PORTFOLIO } from '../../../../config/constants';
@@ -39,11 +38,11 @@ router
     },
   );
 
-router
-  .route('/upload-avatar')
-  .patch(isUserAuthenticated, upload.single('file'), (req, res, next) => {
-    userController.uploadAvatar(req, res, next);
-  });
+// router
+//   .route('/upload-avatar')
+//   .patch(isUserAuthenticated, upload.single('file'), (req, res, next) => {
+//     userController.uploadAvatar(req, res, next);
+//   });
 
 router.get('/search', isUserAuthenticated, (req, res, next) => {
   userController.searchPatients(req, res, next);

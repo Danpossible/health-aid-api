@@ -184,10 +184,7 @@ export const updatePatientAccount = {
       'string.optional': 'Oops!, you have to specify a phone number',
     }),
     residentialAddress: Joi.string().optional(),
-    avatar: Joi.object().keys({
-      url: Joi.string().required(),
-      publicId: Joi.string().required(),
-    }),
+    avatar: Joi.string().optional().uri(),
     role: Joi.string()
       .optional()
       .valid(...Object.values(PORTFOLIO)),

@@ -70,10 +70,7 @@ const patientSchema = new Schema<Patient>(
       type: String,
       enum: Object.values(GENDER),
     },
-    avatar: {
-      url: String,
-      publicId: String,
-    },
+    avatar: String,
     // dob: {
     //   type: Date,
     //   required: false,

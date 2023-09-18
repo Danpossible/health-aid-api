@@ -4,10 +4,8 @@ import httpStatus from 'http-status';
 import AppException from '../../exceptions/AppException';
 import { RequestType } from '../middlewares/auth.middleware';
 import pick from '../../utils/pick';
-import HelperClass from '../../utils/helper';
 import UserService from '../../services/patient.service';
 import NotificationService from '../../services/notification.service';
-import { uploadBase64File } from '../../services/file.service';
 import HealthWorker from '../../database/models/health_worker.model';
 import { PORTFOLIO } from '../../../config/constants';
 import Patient from '../../database/models/patient.model';
@@ -91,36 +89,36 @@ export default class UserController {
     }
   }
 
-  async uploadAvatar(req: RequestType, res: Response, next: NextFunction) {
-    try {
-      const file = req.file;
-      const { secure_url, public_id } = await uploadBase64File(
-        file.path,
-        'Patient_avatar',
-        HelperClass.generateRandomChar(9),
-      );
-      let me;
-      req.user.portfolio === PORTFOLIO.PATIENT
-        ? (me = await this.userService.updatePatientById(req.user.id, {
-            avatar: { url: secure_url, publicId: public_id },
-          }))
-        : (me = await this.userService.update(
-            HealthWorker,
-            { _id: req.user.id },
-            {
-              avatar: { url: secure_url, publicId: public_id },
-            },
-          ));
-      return res.status(httpStatus.OK).json({
-        status: 'success',
-        me,
-      });
-    } catch (err: unknown) {
-      if (err instanceof Error || err instanceof AppException) {
-        return next(new AppException(err.message, httpStatus.BAD_REQUEST));
-      }
-    }
-  }
+  // async uploadAvatar(req: RequestType, res: Response, next: NextFunction) {
+  //   try {
+  //     const file = req.file;
+  //     const { secure_url, public_id } = await uploadBase64File(
+  //       file.path,
+  //       'Patient_avatar',
+  //       HelperClass.generateRandomChar(9),
+  //     );
+  //     let me;
+  //     req.user.portfolio === PORTFOLIO.PATIENT
+  //       ? (me = await this.userService.updatePatientById(req.user.id, {
+  //           avatar: { url: secure_url, publicId: public_id },
+  //         }))
+  //       : (me = await this.userService.update(
+  //           HealthWorker,
+  //           { _id: req.user.id },
+  //           {
+  //             avatar: { url: secure_url, publicId: public_id },
+  //           },
+  //         ));
+  //     return res.status(httpStatus.OK).json({
+  //       status: 'success',
+  //       me,
+  //     });
+  //   } catch (err: unknown) {
+  //     if (err instanceof Error || err instanceof AppException) {
+  //       return next(new AppException(err.message, httpStatus.BAD_REQUEST));
+  //     }
+  //   }
+  // }
 
   async getPatientProfile(req: RequestType, res: Response, next: NextFunction) {
     try {
