@@ -311,6 +311,7 @@ export default class PaymentService {
         }. Update your profile and your dedicated bank account will be generated within 24hours`,
         ...user,
         for: userData.portfolio,
+        type: NOTIFICATION_TYPES.WALLET_NOTIFICATION,
         title: 'Dedicated Bank Account',
       });
       throw new Error(
@@ -347,12 +348,14 @@ export default class PaymentService {
       ...user,
       title: 'Dedicated Bank Account',
       for: userData.portfolio,
+      type: NOTIFICATION_TYPES.WALLET_NOTIFICATION,
     });
     await Notification.createNotification({
       message: `You can now fund your ${config.appName} wallet, receive money and send money through your personal bank account`,
       ...user,
       title: 'Dedicated Bank Account',
       for: userData.portfolio,
+      type: NOTIFICATION_TYPES.WALLET_NOTIFICATION,
     });
     return createAccount;
   }
