@@ -7,25 +7,37 @@ export const updateKyc = {
         driversLicense: Joi.object()
           .keys({
             number: Joi.number().required(),
-            image: Joi.string().required(),
+            image: Joi.object().keys({
+              url: Joi.string().required(),
+              publicId: Joi.string().required(),
+            }),
           })
           .required(),
         medicalLicense: Joi.object()
           .keys({
             number: Joi.number().required(),
-            image: Joi.string().required(),
+            image: Joi.object().keys({
+              url: Joi.string().required(),
+              publicId: Joi.string().required(),
+            }),
           })
           .required(),
         medicalCertificate: Joi.object()
           .keys({
-            image: Joi.string().required(),
+            image: Joi.object().keys({
+              url: Joi.string().required(),
+              publicId: Joi.string().required(),
+            }),
           })
           .required(),
         certifications: Joi.array()
           .items(
             Joi.object().keys({
               name: Joi.string().optional(),
-              image: Joi.string().optional(),
+              image: Joi.object().keys({
+                url: Joi.string().required(),
+                publicId: Joi.string().required(),
+              }),
             }),
           )
           .optional(),
