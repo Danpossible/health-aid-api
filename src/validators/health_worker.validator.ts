@@ -1,9 +1,7 @@
 import Joi from 'joi';
-import objectId from './custom.validator';
 
 export const updateKyc = {
   body: Joi.object().keys({
-    healthWorker: Joi.custom(objectId).required(),
     kyc: Joi.object()
       .keys({
         driversLicense: Joi.object()

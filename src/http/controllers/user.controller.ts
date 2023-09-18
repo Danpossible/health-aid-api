@@ -64,7 +64,7 @@ export default class UserController {
   async updateMyProfile(req: RequestType, res: Response, next: NextFunction) {
     try {
       if (req.body.avatar) {
-        if (req.user.avatar) {
+        if (req.user.avatar && req.user.avatar.publicId) {
           await deleteFile(req.user.avatar.publicId);
         }
         const { secure_url, public_id } = (await uploadBase64File(
@@ -207,56 +207,58 @@ export default class UserController {
 
   async completeProfile(req: RequestType, res: Response, next: NextFunction) {
     try {
-      const uploadDriversLicense = await uploadBase64File(
-        req.body.kyc.driversLicense.image,
-        'health_workers_kyc',
-        HelperClass.generateRandomChar(5),
-      );
-      req.body.kyc.driversLicense.image = {
-        url: uploadDriversLicense.secure_url,
-        publicId: uploadDriversLicense.public_id,
-      };
-
-      const uploadMedicalLicense = await uploadBase64File(
-        req.body.kyc.medicalLicense.image,
-        'health_workers_kyc',
-        HelperClass.generateRandomChar(5),
-      );
-      req.body.kyc.medicalLicense.image = {
-        url: uploadMedicalLicense.secure_url,
-        publicId: uploadMedicalLicense.public_id,
-      };
-
-      const uploadMedicalCertificate = await uploadBase64File(
-        req.body.kyc.medicalCertificate.image,
-        'health_workers_kyc',
-        HelperClass.generateRandomChar(5),
-      );
-      req.body.kyc.medicalCertificate = {
-        url: uploadMedicalCertificate.secure_url,
-        publicId: uploadMedicalCertificate.public_id,
-      };
-
-      const certifications = [];
-      for (const cert of req.body.kyc.certifications) {
-        const uploadCert = await uploadBase64File(
-          cert.image,
+      if (req.body.kyc) {
+        const uploadDriversLicense = await uploadBase64File(
+          req.body.kyc.driversLicense.image,
           'health_workers_kyc',
           HelperClass.generateRandomChar(5),
         );
-        certifications.push({
-          name: cert.name,
-          image: {
-            url: uploadCert.secure_url,
-            publicId: uploadCert.public_id,
-          },
-        });
+        req.body.kyc.driversLicense.image = {
+          url: uploadDriversLicense.secure_url,
+          publicId: uploadDriversLicense.public_id,
+        };
+
+        const uploadMedicalLicense = await uploadBase64File(
+          req.body.kyc.medicalLicense.image,
+          'health_workers_kyc',
+          HelperClass.generateRandomChar(5),
+        );
+        req.body.kyc.medicalLicense.image = {
+          url: uploadMedicalLicense.secure_url,
+          publicId: uploadMedicalLicense.public_id,
+        };
+
+        const uploadMedicalCertificate = await uploadBase64File(
+          req.body.kyc.medicalCertificate.image,
+          'health_workers_kyc',
+          HelperClass.generateRandomChar(5),
+        );
+        req.body.kyc.medicalCertificate = {
+          url: uploadMedicalCertificate.secure_url,
+          publicId: uploadMedicalCertificate.public_id,
+        };
+
+        const certifications = [];
+        for (const cert of req.body.kyc.certifications) {
+          const uploadCert = await uploadBase64File(
+            cert.image,
+            'health_workers_kyc',
+            HelperClass.generateRandomChar(5),
+          );
+          certifications.push({
+            name: cert.name,
+            image: {
+              url: uploadCert.secure_url,
+              publicId: uploadCert.public_id,
+            },
+          });
+        }
+        req.body.kyc.certifications = certifications;
       }
-      req.body.kyc.certifications = certifications;
 
       const data = await this.userService.update(
         HealthWorker,
-        { id: req.body.healthWorker },
+        { _id: req.user.id },
         req.body,
       );
       return res.status(httpStatus.OK).json({
