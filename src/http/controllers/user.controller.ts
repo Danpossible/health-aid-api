@@ -5,10 +5,9 @@ import AppException from '../../exceptions/AppException';
 import { RequestType } from '../middlewares/auth.middleware';
 import pick from '../../utils/pick';
 import HelperClass from '../../utils/helper';
-import { UploadApiResponse } from 'cloudinary';
 import UserService from '../../services/patient.service';
 import NotificationService from '../../services/notification.service';
-import { deleteFile, uploadBase64File } from '../../services/file.service';
+import { uploadBase64File } from '../../services/file.service';
 import HealthWorker from '../../database/models/health_worker.model';
 import { PORTFOLIO } from '../../../config/constants';
 import Patient from '../../database/models/patient.model';
@@ -63,17 +62,17 @@ export default class UserController {
 
   async updateMyProfile(req: RequestType, res: Response, next: NextFunction) {
     try {
-      if (req.body.avatar) {
-        if (req.user.avatar && req.user.avatar.publicId) {
-          await deleteFile(req.user.avatar.publicId);
-        }
-        const { secure_url, public_id } = (await uploadBase64File(
-          req.body.avatar,
-          'patient_avatar',
-          HelperClass.generateRandomChar(9),
-        )) as UploadApiResponse;
-        req.body.avatar = { url: secure_url, publicId: public_id };
-      }
+      // if (req.body.avatar) {
+      //   if (req.user.avatar && req.user.avatar.publicId) {
+      //     await deleteFile(req.user.avatar.publicId);
+      //   }
+      //   const { secure_url, public_id } = (await uploadBase64File(
+      //     req.body.avatar,
+      //     'patient_avatar',
+      //     HelperClass.generateRandomChar(9),
+      //   )) as UploadApiResponse;
+      //   req.body.avatar = { url: secure_url, publicId: public_id };
+      // }
       let me;
       req.user.portfolio === PORTFOLIO.PATIENT
         ? (me = await this.userService.updatePatientById(req.user.id, req.body))
@@ -207,54 +206,54 @@ export default class UserController {
 
   async completeProfile(req: RequestType, res: Response, next: NextFunction) {
     try {
-      if (req.body.kyc) {
-        const uploadDriversLicense = await uploadBase64File(
-          req.body.kyc.driversLicense.image,
-          'health_workers_kyc',
-          HelperClass.generateRandomChar(5),
-        );
-        req.body.kyc.driversLicense.image = {
-          url: uploadDriversLicense.secure_url,
-          publicId: uploadDriversLicense.public_id,
-        };
+      // if (req.body.kyc) {
+      //   const uploadDriversLicense = await uploadBase64File(
+      //     req.body.kyc.driversLicense.image,
+      //     'health_workers_kyc',
+      //     HelperClass.generateRandomChar(5),
+      //   );
+      //   req.body.kyc.driversLicense.image = {
+      //     url: uploadDriversLicense.secure_url,
+      //     publicId: uploadDriversLicense.public_id,
+      //   };
 
-        const uploadMedicalLicense = await uploadBase64File(
-          req.body.kyc.medicalLicense.image,
-          'health_workers_kyc',
-          HelperClass.generateRandomChar(5),
-        );
-        req.body.kyc.medicalLicense.image = {
-          url: uploadMedicalLicense.secure_url,
-          publicId: uploadMedicalLicense.public_id,
-        };
+      //   const uploadMedicalLicense = await uploadBase64File(
+      //     req.body.kyc.medicalLicense.image,
+      //     'health_workers_kyc',
+      //     HelperClass.generateRandomChar(5),
+      //   );
+      //   req.body.kyc.medicalLicense.image = {
+      //     url: uploadMedicalLicense.secure_url,
+      //     publicId: uploadMedicalLicense.public_id,
+      //   };
 
-        const uploadMedicalCertificate = await uploadBase64File(
-          req.body.kyc.medicalCertificate.image,
-          'health_workers_kyc',
-          HelperClass.generateRandomChar(5),
-        );
-        req.body.kyc.medicalCertificate = {
-          url: uploadMedicalCertificate.secure_url,
-          publicId: uploadMedicalCertificate.public_id,
-        };
+      //   const uploadMedicalCertificate = await uploadBase64File(
+      //     req.body.kyc.medicalCertificate.image,
+      //     'health_workers_kyc',
+      //     HelperClass.generateRandomChar(5),
+      //   );
+      //   req.body.kyc.medicalCertificate = {
+      //     url: uploadMedicalCertificate.secure_url,
+      //     publicId: uploadMedicalCertificate.public_id,
+      //   };
 
-        const certifications = [];
-        for (const cert of req.body.kyc.certifications) {
-          const uploadCert = await uploadBase64File(
-            cert.image,
-            'health_workers_kyc',
-            HelperClass.generateRandomChar(5),
-          );
-          certifications.push({
-            name: cert.name,
-            image: {
-              url: uploadCert.secure_url,
-              publicId: uploadCert.public_id,
-            },
-          });
-        }
-        req.body.kyc.certifications = certifications;
-      }
+      //   const certifications = [];
+      //   for (const cert of req.body.kyc.certifications) {
+      //     const uploadCert = await uploadBase64File(
+      //       cert.image,
+      //       'health_workers_kyc',
+      //       HelperClass.generateRandomChar(5),
+      //     );
+      //     certifications.push({
+      //       name: cert.name,
+      //       image: {
+      //         url: uploadCert.secure_url,
+      //         publicId: uploadCert.public_id,
+      //       },
+      //     });
+      //   }
+      //   req.body.kyc.certifications = certifications;
+      // }
 
       const data = await this.userService.update(
         HealthWorker,
