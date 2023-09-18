@@ -170,6 +170,7 @@ export enum PAID_WITH {
 
 export enum NOTIFICATION_TYPES {
   TRANSACTION_NOTIFICATION = 'transaction_notification',
+  WALLET_NOTIFICATION = 'wallet_notification',
 }
 
 export enum AVAILABILITY {
