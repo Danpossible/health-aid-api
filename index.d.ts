@@ -134,10 +134,7 @@ interface Patient extends AuditableFields {
   appVersion?: string;
   gender?: GENDER;
   phoneNumber: string;
-  avatar: {
-    url: string;
-    publicId: string;
-  };
+  avatar: string;
   systemCode: string;
   dob?: Date;
   deviceInfo: typeof Map;
@@ -176,10 +173,7 @@ interface HealthWorker extends AuditableFields {
   gender?: GENDER;
   systemCode: string;
   phoneNumber: string;
-  avatar: {
-    url: string;
-    publicId: string;
-  };
+  avatar: string;
   deviceInfo: typeof Map;
   referralCode: string;
   inviteCode: string;
