@@ -295,65 +295,66 @@ export default class PaymentService {
       //   : `+234${userData.phoneNumber}`,
       phoneNumber: userData.phoneNumber,
     };
+    const user =
+      userData instanceof HealthWorker
+        ? { patient: userData._id, walletFor: PORTFOLIO.PATIENT }
+        : {
+            healthWorker: userData._id as string,
+            walletFor: PORTFOLIO.HEALTH_WORKER,
+          };
 
     const accountInfo = await this.paga.generatePermanentAccount(data);
-    if (!accountInfo.error) {
-      const object: { [key: string]: string | number } = {
-        accountNumber: accountInfo.accountNumber,
-        walletReference: accountInfo.walletReference,
-        accountName: data.accountName,
-        bankName: 'Paga',
-        bankReferenceNumber: accountInfo.referenceNumber,
-        callbackUrl: accountInfo.callbackUrl,
-        availableBalance:
-          account.availableBalance !== null || undefined
-            ? account.availableBalance
-            : 0,
-        ledgerBalance:
-          account.ledgerBalance !== null || undefined
-            ? account.ledgerBalance
-            : 0,
-      };
-
-      // userData instanceof HealthWorker
-      //   ? ((object.patient = userData._id), (object.walletFor = PORTFOLIO.PATIENT))
-      //   : ((object.healthWorker = userData._id as string),
-      //     (object.walletFor = PORTFOLIO.HEALTH_WORKER));
-
-      const user =
-        userData instanceof HealthWorker
-          ? { patient: userData._id, walletFor: PORTFOLIO.PATIENT }
-          : {
-              healthWorker: userData._id as string,
-              walletFor: PORTFOLIO.HEALTH_WORKER,
-            };
-
-      const createAccount = await Account.create({ ...object, ...user });
-
+    if (accountInfo.error) {
       await Notification.createNotification({
-        message: `A dedicated account setup for you`,
-        user: userData._id as string,
+        message: `Could not generate a dedicated bank account for you due to ${
+          accountInfo.errorMessage || accountInfo.statusMessage
+        }. Update your profile and your dedicated bank account will be generated within 24hours`,
+        ...user,
+        for: userData.portfolio,
         title: 'Dedicated Bank Account',
       });
-      await Notification.createNotification({
-        message: `You can now fund your ${config.appName} wallet, receive money and send money through your personal bank account`,
-        user: userData._id as string,
-        title: 'Dedicated Bank Account',
-      });
-      return createAccount;
+      throw new Error(
+        `Could not generate a dedicated bank account for you due to ${
+          accountInfo.errorMessage || accountInfo.statusMessage
+        }. Update your profile to get your dedicated bank account`,
+      );
     }
+    const object: { [key: string]: string | number } = {
+      accountNumber: accountInfo.accountNumber,
+      walletReference: accountInfo.walletReference,
+      accountName: data.accountName,
+      bankName: 'Paga',
+      bankReferenceNumber: accountInfo.referenceNumber,
+      callbackUrl: accountInfo.callbackUrl,
+      availableBalance:
+        account.availableBalance !== null || undefined
+          ? account.availableBalance
+          : 0,
+      ledgerBalance:
+        account.ledgerBalance !== null || undefined ? account.ledgerBalance : 0,
+    };
+
+    // userData instanceof HealthWorker
+    //   ? ((object.patient = userData._id), (object.walletFor = PORTFOLIO.PATIENT))
+    //   : ((object.healthWorker = userData._id as string),
+    //     (object.walletFor = PORTFOLIO.HEALTH_WORKER));
+
+    const createAccount = await Account.create({ ...object, ...user });
+
     await Notification.createNotification({
-      message: `Could not generate a dedicated bank account for you due to ${
-        accountInfo.errorMessage || accountInfo.statusMessage
-      }. Update your profile and your dedicated bank account will be generated within 24hours`,
-      user: userData.id,
+      message: `A dedicated account setup for you`,
+      user: userData._id as string,
+      ...user,
       title: 'Dedicated Bank Account',
+      for: userData.portfolio,
     });
-    throw new Error(
-      `Could not generate a dedicated bank account for you due to ${
-        accountInfo.errorMessage || accountInfo.statusMessage
-      }. Update your profile to get your dedicated bank account`,
-    );
+    await Notification.createNotification({
+      message: `You can now fund your ${config.appName} wallet, receive money and send money through your personal bank account`,
+      ...user,
+      title: 'Dedicated Bank Account',
+      for: userData.portfolio,
+    });
+    return createAccount;
   }
 
   async withdrawMoney(
