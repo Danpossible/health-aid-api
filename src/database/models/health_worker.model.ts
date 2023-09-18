@@ -108,17 +108,11 @@ const HealthWorkerSchema = new Schema<HealthWorker>(
     kyc: {
       driversLicense: {
         number: Number,
-        image: {
-          url: String,
-          publicId: String,
-        },
+        image: String,
       },
       medicalLicense: {
         number: Number,
-        image: {
-          url: String,
-          publicId: String,
-        },
+        image: String,
       },
       medicalCertificate: {
         url: String,
@@ -127,10 +121,7 @@ const HealthWorkerSchema = new Schema<HealthWorker>(
       certifications: [
         {
           name: String,
-          image: {
-            url: String,
-            publicId: String,
-          },
+          image: String,
         },
       ],
     },
