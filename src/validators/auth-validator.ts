@@ -60,6 +60,7 @@ export const createUserValidator = {
   body: Joi.object().keys({
     firstName: Joi.string().min(3).lowercase().max(40).required(),
     lastName: Joi.string().min(3).lowercase().max(40).required(),
+    middleName: Joi.string().min(3).lowercase().max(40).optional(),
     portfolio: Joi.string()
       .valid(...Object.values(PORTFOLIO))
       .required(),
