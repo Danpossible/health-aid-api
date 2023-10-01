@@ -289,32 +289,36 @@ export default class PaymentService {
     };
   }
 
-  async setupAccount<T extends Patient | HealthWorker>(
-    userData: Partial<T>,
-    account?: { availableBalance?: number; ledgerBalance?: number },
-  ) {
-    const data = {
-      firstName: userData.firstName,
-      lastName: userData.lastName,
-      accountName: `${userData.firstName} ${userData.lastName}`,
-      // phoneNumber: userData.phoneNumber.startsWith('+234')
-      //   ? userData.phoneNumber
-      //   : `+234${userData.phoneNumber}`,
-      phoneNumber: userData.phoneNumber,
-    };
+  async setupAccount<T extends Patient | HealthWorker>(userData: Partial<T>) {
+    const paystack = await this._initPaystackSdk();
     const user =
-      userData instanceof HealthWorker
+      userData.portfolio === PORTFOLIO.PATIENT
         ? { patient: userData._id, walletFor: PORTFOLIO.PATIENT }
         : {
             healthWorker: userData._id as string,
             walletFor: PORTFOLIO.HEALTH_WORKER,
           };
 
-    const accountInfo = await this.paga.generatePermanentAccount(data);
-    if (accountInfo.error) {
+    // let paystackCustomer = await paystack.getCustomerDetails(userData.email);
+    // if (paystackCustomer.error) {
+    const paystackCustomer = await paystack.createCustomer({
+      email: userData.email,
+      first_name: userData.firstName,
+      last_name: userData.lastName,
+      phone: userData.phoneNumber,
+    });
+    if (paystackCustomer.error) throw new Error(paystackCustomer.message);
+    // }
+
+    // use the customer details to create a paystack DVA
+    const paystackDVA = await paystack.createDVA({
+      customer: paystackCustomer.data.customer_code,
+      preferred_bank: 'wema-bank',
+    });
+    if (paystackDVA.error) {
       await Notification.createNotification({
         message: `Could not generate a dedicated bank account for you due to ${
-          accountInfo.errorMessage || accountInfo.statusMessage
+          paystackDVA.errorMessage || paystackDVA.statusMessage
         }. Update your profile and your dedicated bank account will be generated within 24hours`,
         ...user,
         for: userData.portfolio,
@@ -323,29 +327,31 @@ export default class PaymentService {
       });
       throw new Error(
         `Could not generate a dedicated bank account for you due to ${
-          accountInfo.errorMessage || accountInfo.statusMessage
+          paystackDVA.errorMessage || paystackDVA.statusMessage
         }. Update your profile to get your dedicated bank account`,
       );
     }
-    const object: { [key: string]: string | number } = {
-      accountNumber: accountInfo.accountNumber,
-      walletReference: accountInfo.walletReference,
-      accountName: data.accountName,
-      bankName: 'Paga',
-      bankReferenceNumber: accountInfo.referenceNumber,
-      callbackUrl: accountInfo.callbackUrl,
-      availableBalance:
-        account.availableBalance !== null || undefined
-          ? account.availableBalance
-          : 0,
-      ledgerBalance:
-        account.ledgerBalance !== null || undefined ? account.ledgerBalance : 0,
-    };
 
-    // userData instanceof HealthWorker
-    //   ? ((object.patient = userData._id), (object.walletFor = PORTFOLIO.PATIENT))
-    //   : ((object.healthWorker = userData._id as string),
-    //     (object.walletFor = PORTFOLIO.HEALTH_WORKER));
+    const object = {
+      walletNumber: paystackDVA.data.account_number,
+      walletReference: paystackDVA.data.walletReference,
+      walletName: paystackDVA.data.account_name,
+      walletFor: userData.portfolio,
+      bank: {
+        name: paystackDVA.data.bank.name,
+        slug: paystackDVA.data.bank.slug,
+        id: paystackDVA.data.bank.id,
+      },
+      dvaID: paystackDVA.data.id,
+      assignment: {
+        integration: paystackDVA.data.assignment.integration,
+        assigned_at: paystackDVA.data.assignment.assigned_at,
+        assignee_id: paystackDVA.data.assignment.assignee_id,
+        expired: paystackDVA.data.assignment.expired,
+        account_type: paystackDVA.data.assignment.account_type,
+        assignee_type: paystackDVA.data.assignment.assignee_type,
+      },
+    };
 
     const createAccount = await Account.create({ ...object, ...user });
 

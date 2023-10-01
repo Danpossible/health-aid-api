@@ -6,6 +6,8 @@ import TokenService from '../../../services/token.service';
 import UserService from '../../../services/patient.service';
 import AdminAuth from './admin.auth';
 import PatientAuth from './auth.controller';
+import PaymentService from '../../../services/payment.service';
+import Paga from '../../../services/Paga.service';
 
 export const authController = new PatientAuth(
   new AuthService(
@@ -17,6 +19,7 @@ export const authController = new PatientAuth(
   new EncryptionService(),
   new EmailService(),
   new TokenService(),
+  new PaymentService(new Paga(), new EmailService(), new UserService()),
 );
 
 export const adminAuthController = new AdminAuth(
@@ -26,5 +29,6 @@ export const adminAuthController = new AdminAuth(
     new EmailService(),
   ),
   new AdminService(),
-  new EncryptionService(),new TokenService(),
+  new EncryptionService(),
+  new TokenService(),
 );

@@ -14,6 +14,7 @@ import EmailService from '../../../services/email.service';
 import UserService from '../../../services/patient.service';
 import TokenService from '../../../services/token.service';
 import { JwtPayload } from 'jsonwebtoken';
+import PaymentService from '../../../services/payment.service';
 // const sendChamp = new SendChamp({
 //   mode: config.sendChamp.mode,
 //   publicKey: config.sendChamp.apiKey,
@@ -25,6 +26,7 @@ export default class PatientAuth {
     private readonly encryptionService: EncryptionService,
     private readonly emailService: EmailService,
     private readonly tokenService: TokenService,
+    private readonly paymentService: PaymentService,
   ) {}
 
   async create(req: Request, res: Response, next: NextFunction) {
@@ -456,7 +458,7 @@ export default class PatientAuth {
       const _hashedEmailToken: string = await this.encryptionService.hashString(
         req.body.otp,
       );
-      let user: Patient | HealthWorker;
+      let user;
       user = await this.userService.getPatientDetail({
         'accountStatus.status': ACCOUNT_STATUS.PENDING,
         verificationToken: _hashedEmailToken,
@@ -492,6 +494,7 @@ export default class PatientAuth {
       user.portfolio === PORTFOLIO.PATIENT
         ? await this.userService.updatePatientById(user.id, data)
         : await this.userService.update(HealthWorker, { _id: user.id }, data);
+      await this.paymentService.setupAccount<typeof user>(user);
       return res.status(httpStatus.OK).json({
         status: `success`,
         message: `Your account has been verified`,

@@ -463,6 +463,7 @@ interface Wallet extends AuditableFields {
   walletFor: PORTFOLIO;
   id: string;
   walletNumber: string;
+  dvaID: string;
   transactionPin: string;
   walletName: string;
   bankName: string;
@@ -474,7 +475,19 @@ interface Wallet extends AuditableFields {
   walletNumber: string;
   locked: boolean;
   walletName: string;
-  bankName: string;
+  bank: {
+    name: string;
+    id: number;
+    slug: string;
+  };
+  assignment: {
+    integration: number;
+    assignee_id: number;
+    assignee_type: string;
+    expired: boolean;
+    account_type: string;
+    assigned_at: string;
+  };
   bankReferenceNumber: string;
   walletReference: string;
   stash: string;
