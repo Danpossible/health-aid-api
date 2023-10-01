@@ -46,6 +46,8 @@ const envVarsSchema = Joi.object()
     CLOUDINARY_API_SECRET: Joi.string()
       .label('Cloudinary API Secret')
       .required(),
+    PAYSTACK_PUBLIC_KEY: Joi.string().label('Paystack Public Key').required(),
+    PAYSTACK_SECRET_KEY: Joi.string().label('Paystack Secret Key').required(),
   })
   .unknown();
 const { value: envVars, error } = envVarsSchema
@@ -101,5 +103,7 @@ export default {
     depositCharge: envVars.DEPOSIT_CHARGE,
     withdrawalProcessingCost: envVars.WITHDRAWAL_PROCESSING_COST,
     withdrawalCharge: envVars.WITHDRAWAL_CHARGE,
+    paystackSecretKey: envVars.PAYSTACK_SECRET_KEY,
+    paystackPublicKey: envVars.PAYSTACK_PUBLIC_KEY,
   },
 };
