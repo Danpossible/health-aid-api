@@ -302,7 +302,6 @@ export default class PaymentController {
       if (!accountInfo) {
         const newAccountInfo = await this.paymentService.setupAccount<User>(
           req.user,
-          {},
         );
         return res.status(httpStatus.CREATED).json(newAccountInfo);
       }

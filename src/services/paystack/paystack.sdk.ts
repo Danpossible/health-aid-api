@@ -13,16 +13,24 @@ export default class PaystackSdk extends PaystackUtilFunction {
     phone: string;
   }) {
     const response = await this.postRequest<any, any>(
-      await this.buildHeader(),
+      this.buildHeader(),
       data,
       `${this.getBaseUrl()}/customer`,
     );
     return this.checkError(response);
   }
 
+  async getCustomerDetails(identifier: string) {
+    const response = await this.getRequest<any>(
+      this.buildHeader(),
+      `${this.getBaseUrl()}/customer/${identifier}`,
+    );
+    return this.checkError(response);
+  }
+
   async createDVA(data: { preferred_bank: string; customer: string }) {
     const response = await this.postRequest<any, any>(
-      await this.buildHeader(),
+      this.buildHeader(),
       data,
       `${this.getBaseUrl()}/dedicated_account`,
     );
