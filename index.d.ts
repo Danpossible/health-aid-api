@@ -538,3 +538,9 @@ interface TransactionDump extends AuditableFields {
   driver: Driver | string;
   type: TRANSACTION_DUMP_TYPES;
 }
+interface BaseResponse {
+  error: boolean;
+  status: string;
+  message: string;
+  Message: string;
+}

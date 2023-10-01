@@ -26,6 +26,7 @@ import Wallet from '../database/models/wallet/wallet.model';
 import HelperClass from '../utils/helper';
 import TransactionDump from '../database/models/wallet/TransactionDump.model';
 import HealthAidEarnings from '../database/models/wallet/Earning.model';
+import PaystackClient from './paystack/paystack.client';
 
 export default class PaymentService {
   constructor(
@@ -33,6 +34,12 @@ export default class PaymentService {
     private readonly emailService: EmailService,
     private readonly userService: UserService,
   ) {}
+
+  private async _initPaystackSdk() {
+    return new PaystackClient()
+      .setApiKey(config.paymentData.paystackSecretKey)
+      .build();
+  }
 
   async getTransactions(
     filter: Partial<TransactionLog>,
@@ -388,7 +395,9 @@ export default class PaymentService {
   }
 
   async getBanks() {
-    const banks = await this.paga.getBanks();
+    const paystack = await this._initPaystackSdk();
+    const banks = await paystack.getBanks();
+    if (banks.error) throw new Error(banks.message);
     return banks;
   }
 
@@ -398,19 +407,26 @@ export default class PaymentService {
   }
 
   async validateAccountNumber(data: { accountNumber: string; bankId: string }) {
-    const account = await this.paga.checkAccount({
-      accountNumber: data.accountNumber,
-      bankId: data.bankId,
+    // const account = await this.paga.checkAccount({
+    //   accountNumber: data.accountNumber,
+    //   bankId: data.bankId,
+    // });
+    // if (account.error) throw new Error(account.message);
+    // else {
+    //   const payload = {
+    //     accountNumber: data.accountNumber,
+    //     accountName: account.destinationAccountHolderNameAtBank,
+    //     fee: 60,
+    //   };
+    //   return payload;
+    // }
+    const paystack = await this._initPaystackSdk();
+    const account = await paystack.verifyBankAccount({
+      account_number: data.accountNumber,
+      bank_code: data.bankId,
     });
     if (account.error) throw new Error(account.message);
-    else {
-      const payload = {
-        accountNumber: data.accountNumber,
-        accountName: account.destinationAccountHolderNameAtBank,
-        fee: 60,
-      };
-      return payload;
-    }
+    return account;
   }
 
   async validateWalletNumber(walletNumber: string) {
