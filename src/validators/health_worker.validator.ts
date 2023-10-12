@@ -9,18 +9,18 @@ export const updateKyc = {
             number: Joi.number().required(),
             image: Joi.string().required().uri(),
           })
-          .required(),
+          .optional(),
         medicalLicense: Joi.object()
           .keys({
             number: Joi.number().required(),
             image: Joi.string().required().uri(),
           })
-          .required(),
+          .optional(),
         medicalCertificate: Joi.object()
           .keys({
             image: Joi.string().required().uri(),
           })
-          .required(),
+          .optional(),
         certifications: Joi.array()
           .items(
             Joi.object().keys({

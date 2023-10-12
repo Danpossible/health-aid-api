@@ -334,13 +334,23 @@ export default class PatientAuth {
       //   ? req.body.phoneNumber
       //   : `+234${req.body.phoneNumber.replace(/^0+/, '')}`;
       let user: Patient | HealthWorker;
-      user = await this.userService.getPatientDetail({
+
+      // user = await this.userService.getPatientDetail({
+      //   email: req.body.email,
+      // });
+
+      user = await Patient.findOne({
         email: req.body.email,
       });
+
+      //
       if (!user) {
-        user = await this.userService.getOne(HealthWorker, {
+        user = await HealthWorker.findOne({
           email: req.body.email,
         });
+        // user = await this.userService.getOne(HealthWorker, {
+        //   email: req.body.email,
+        // });
       }
       if (!user) throw new Error('Oops! Patient does not exist');
       const otp = HelperClass.generateRandomChar(6, 'num');
