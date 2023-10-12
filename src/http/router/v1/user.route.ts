@@ -33,7 +33,7 @@ router
   .route('/complete-profile')
   .patch(
     isUserAuthenticated,
-    validate(updateKyc),
+     validate(updateKyc),
     restrictAccessTo(PORTFOLIO.HEALTH_WORKER),
     (req, res, next) => {
       userController.completeProfile(req, res, next);
