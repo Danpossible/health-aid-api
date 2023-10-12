@@ -26,6 +26,8 @@ router
     },
   );
 
+// router.route('/me/reset-password').patch(isUserAuthenticated, validate(resetPassword), (req, res, next) => {
+
 /** Health workers */
 router
   .route('/complete-profile')

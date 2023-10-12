@@ -9,9 +9,13 @@ import NotificationService from '../../services/notification.service';
 import HealthWorker from '../../database/models/health_worker.model';
 import { PORTFOLIO } from '../../../config/constants';
 import Patient from '../../database/models/patient.model';
+import EncryptionService from '../../services/encryption.service';
 
 export default class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly encryptionService: EncryptionService,
+  ) {}
   async getAllPatients(req: RequestType, res: Response, next: NextFunction) {
     try {
       const options = pick(req.query, ['limit', 'page', 'populate', 'orderBy']);
@@ -82,6 +86,41 @@ export default class UserController {
       return res.status(httpStatus.OK).json({
         status: 'success',
         me,
+      });
+    } catch (err: unknown) {
+      if (err instanceof Error || err instanceof AppException)
+        return next(new AppException(err.message, httpStatus.BAD_REQUEST));
+    }
+  }
+
+  async resetPassword(req: RequestType, res: Response, next: NextFunction) {
+    try {
+      let user;
+      user = await Patient.findOne({
+        id: req.user.id,
+      }).select('+password');
+      if (!user) {
+        user = await HealthWorker.findOne({
+          id: req.user.id,
+        }).select('+password');
+        if (!user) throw new Error('Oops! user not found');
+      }
+      if (
+        !(await this.encryptionService.comparePassword(
+          user.password,
+          req.body.oldPassword,
+        ))
+      )
+        throw new Error('Oops! password is not valid');
+
+      const hashPassword = await this.encryptionService.hashPassword(
+        req.body.newPassword,
+      );
+      user.password = hashPassword;
+      await user.save();
+      return res.status(httpStatus.OK).json({
+        status: 'success',
+        message: 'Password updated successfully',
       });
     } catch (err: unknown) {
       if (err instanceof Error || err instanceof AppException)
