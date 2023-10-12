@@ -12,7 +12,10 @@ import AdminController from './admin.controller';
 import PaymentController from './payment.controller';
 import UserController from './user.controller';
 
-export const userController = new UserController(new UserService());
+export const userController = new UserController(
+  new UserService(),
+  new EncryptionService(),
+);
 
 export const adminController = new AdminController(
   new AdminService(),
