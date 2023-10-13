@@ -198,14 +198,6 @@ export const updatePatientAccount = {
   }),
 };
 
-export const resetPassword = {
-  body: Joi.object().keys({
-    currentPassword: Joi.string().required(),
-    newPassword: Joi.string().required(),
-    confirmPassword: Joi.ref('newPassword'),
-  }),
-};
-
 export const waitList = {
   body: Joi.object().keys({
     email: Joi.string().email().required(),
@@ -310,5 +302,13 @@ export const updateAdmin = {
       reason: Joi.string().required(),
     }),
     avatar: Joi.string().optional(),
+  }),
+};
+
+export const resetPassword = {
+  body: Joi.object().keys({
+    currentPassword: Joi.string().required(),
+    newPassword: Joi.string().required(),
+    confirmPassword: Joi.ref('newPassword'),
   }),
 };

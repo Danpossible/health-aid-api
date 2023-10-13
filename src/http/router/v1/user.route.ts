@@ -2,7 +2,10 @@ import { Router } from 'express';
 import { userController } from '../../controllers/controllers.module';
 import { isUserAuthenticated } from '../../middlewares/auth.middleware';
 import validate from '../../middlewares/validate';
-import { updatePatientAccount } from '../../../validators/auth-validator';
+import {
+  resetPassword,
+  updatePatientAccount,
+} from '../../../validators/auth-validator';
 import { updateKyc } from '../../../validators/health_worker.validator';
 import { restrictAccessTo } from '../../middlewares/role.middleware';
 import { PORTFOLIO } from '../../../../config/constants';
@@ -26,7 +29,11 @@ router
     },
   );
 
-// router.route('/me/reset-password').patch(isUserAuthenticated, validate(resetPassword), (req, res, next) => {
+router
+  .route('/me/reset-password')
+  .patch(isUserAuthenticated, validate(resetPassword), (req, res, next) => {
+    userController.resetPassword(req, res, next);
+  });
 
 /** Health workers */
 router
