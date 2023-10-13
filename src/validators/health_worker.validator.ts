@@ -6,21 +6,21 @@ export const updateKyc = {
       .keys({
         driversLicense: Joi.object()
           .keys({
-            number: Joi.number().required(),
+            number: Joi.string().required(),
             image: Joi.string().required().uri(),
           })
-          .required(),
+          .optional(),
         medicalLicense: Joi.object()
           .keys({
-            number: Joi.number().required(),
+            number: Joi.string().required(),
             image: Joi.string().required().uri(),
           })
-          .required(),
+          .optional(),
         medicalCertificate: Joi.object()
           .keys({
             image: Joi.string().required().uri(),
           })
-          .required(),
+          .optional(),
         certifications: Joi.array()
           .items(
             Joi.object().keys({
@@ -30,7 +30,7 @@ export const updateKyc = {
           )
           .optional(),
       })
-      .required(),
+      .optional(),
     specialization: Joi.array().items(Joi.string().optional()),
     experience: Joi.array().items(Joi.string().optional()),
     location: Joi.object().keys({
