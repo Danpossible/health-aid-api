@@ -191,16 +191,24 @@ interface HealthWorker extends AuditableFields {
     country?: string;
     address?: string;
   };
+  homeLocation?: {
+    latitude: number;
+    longitude: number;
+    state?: string;
+    country?: string;
+    address?: string;
+  };
   kyc?: {
     driversLicense: {
       number: number;
+      typeId: string,
       image: {
         url: string;
         publicId: string;
       };
     };
     medicalLicense: {
-      number: number;
+      number: string;
       image: {
         url: string;
         publicId: string;

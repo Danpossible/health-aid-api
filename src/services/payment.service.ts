@@ -314,6 +314,7 @@ export default class PaymentService {
     const paystackDVA = await paystack.createDVA({
       customer: paystackCustomer.data.customer_code,
       preferred_bank: 'wema-bank',
+      phone: userData.phoneNumber,
     });
     if (paystackDVA.error) {
       await Notification.createNotification({

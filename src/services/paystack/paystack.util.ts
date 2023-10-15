@@ -32,15 +32,16 @@ export default class PaystackUtilFunction {
   }
 
   async postRequest<T, K>(headers: ObjT, jsonData: T, url: string): Promise<K> {
-    const data = await fetch(url, {
+    const data = await axios({
       method: 'POST',
-      headers,
-      body: JSON.stringify(jsonData),
+      url,
+      headers: headers,
+      data: jsonData,
     });
-    const respStr = await data.text();
+    const respStr = await data.data;
     let resp;
     try {
-      resp = JSON.parse(respStr);
+      resp = respStr;
       String(data.status).startsWith('2')
         ? Object.assign(resp, { status: 'success' })
         : Object.assign(resp, { status: 'error' });

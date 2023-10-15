@@ -67,7 +67,7 @@ const HealthWorkerSchema = new Schema<HealthWorker>(
       required: false,
       trim: true,
     },
-    availability: { type: String, enum: Object.values(AVAILABILITY) },
+    availability: { type: String, enum: Object.values(AVAILABILITY) , default: AVAILABILITY.AVAILABLE_IN_PERSON_AND_REMOTE },
     verifiedAt: Date,
     verificationToken: String,
     verificationTokenExpiry: Date,
@@ -105,13 +105,21 @@ const HealthWorkerSchema = new Schema<HealthWorker>(
       country: { type: String, default: 'Nigeria' },
       address: String,
     },
+    homeLocation: {
+      latitude: Number,
+      longitude: Number,
+      state: String,
+      country: { type: String, default: 'Nigeria' },
+      address: String,
+    },
     kyc: {
       driversLicense: {
-        number: Number,
+        typeId: String,
+        number: String,
         image: String,
       },
       medicalLicense: {
-        number: Number,
+        number: String,
         image: String,
       },
       medicalCertificate: {

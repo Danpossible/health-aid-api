@@ -28,7 +28,7 @@ export default class PaystackSdk extends PaystackUtilFunction {
     return this.checkError(response);
   }
 
-  async createDVA(data: { preferred_bank: string; customer: string }) {
+  async createDVA(data: { preferred_bank: string; customer: string , phone: string }) {
     const response = await this.postRequest<any, any>(
       this.buildHeader(),
       data,

@@ -486,24 +486,28 @@ export default class PatientAuth {
 
       if (user.verificationTokenExpiry < moment().utc().startOf('day').toDate())
         throw new Error(`Oops!, your otp has expired`);
-      // const data: Pick<
-      //   Patient | HealthWorker,
-      //   | 'verifiedAt'
-      //   | 'verificationToken'
-      //   | 'verificationTokenExpiry'
-      //   | 'accountStatus'
-      // > = {
-      //   verifiedAt: moment().utc().toDate(),
-      //   verificationToken: null,
-      //   verificationTokenExpiry: null,
-      //   accountStatus: {
-      //     status: ACCOUNT_STATUS.CONFIRMED,
-      //     reason: `Your account has been verified`,
-      //   },
-      // };
-      // user.portfolio === PORTFOLIO.PATIENT
-      //   ? await this.userService.updatePatientById(user.id, data)
-      //   : await this.userService.update(HealthWorker, { _id: user.id }, data);
+
+      // -- Start of fix.
+      const data: Pick<
+        Patient | HealthWorker,
+        | 'verifiedAt'
+        | 'verificationToken'
+        | 'verificationTokenExpiry'
+        | 'accountStatus'
+      > = {
+        verifiedAt: moment().utc().toDate(),
+        verificationToken: null,
+        verificationTokenExpiry: null,
+        accountStatus: {
+          status: ACCOUNT_STATUS.CONFIRMED,
+          reason: `Your account has been verified`,
+        },
+      };
+      user.portfolio === PORTFOLIO.PATIENT
+        ? await this.userService.updatePatientById(user.id, data)
+        : await this.userService.update(HealthWorker, { _id: user.id }, data);
+      // -- without this section a verified account will not update status
+
       await this.paymentService.setupAccount<typeof user>(user);
       return res.status(httpStatus.OK).json({
         status: `success`,

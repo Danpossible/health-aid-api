@@ -19,8 +19,8 @@ export enum PORTFOLIO {
 export enum HEALTH_WORKER_TYPE {
   DOCTOR = 'doctor',
   NURSE = 'nurse',
-  PHARMACIST = 'pharmacist',
-  LAB_SCIENTIST = 'lab_scientist',
+  CARE_GIVER = 'care_giver',
+  HOME_HEALTH_AID = 'home_health_aide',
 }
 
 export enum PAYMENT_SOURCE {
