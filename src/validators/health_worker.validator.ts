@@ -12,6 +12,7 @@ export const updateKyc = {
           .optional(),
         medicalLicense: Joi.object()
           .keys({
+            typeId: Joi.string().optional(),
             number: Joi.string().required(),
             image: Joi.string().required().uri(),
           })
@@ -40,5 +41,12 @@ export const updateKyc = {
       country: Joi.string().optional(),
       address: Joi.string().optional(),
     }),
+    homeLocation: Joi.object().keys({
+      latitude: Joi.number().optional(),
+      longitude: Joi.number().optional(),
+      state: Joi.string().optional(),
+      country: Joi.string().optional(),
+      address: Joi.string().optional(),
+    }).optional(),
   }),
 };
