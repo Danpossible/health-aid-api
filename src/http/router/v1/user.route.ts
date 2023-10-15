@@ -30,7 +30,7 @@ router
   );
 
 router
-  .route('/me/reset-passwor')
+  .route('/me/reset-password')
   .patch(isUserAuthenticated, validate(resetPassword), (req, res, next) => {
     userController.resetPassword(req, res, next);
   });
