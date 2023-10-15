@@ -60,7 +60,7 @@ export const createUserValidator = {
   body: Joi.object().keys({
     firstName: Joi.string().min(3).lowercase().max(40).required(),
     lastName: Joi.string().min(3).lowercase().max(40).required(),
-    middleName: Joi.string().min(3).lowercase().max(40).optional(),
+    middleName: Joi.string().min(1).lowercase().max(40).optional(),
     portfolio: Joi.string()
       .valid(...Object.values(PORTFOLIO))
       .required(),
@@ -208,7 +208,7 @@ export const createAdminValidator = {
   body: Joi.object().keys({
     firstName: Joi.string().min(3).lowercase().max(40).required(),
     lastName: Joi.string().min(3).lowercase().max(40).required(),
-    middleName: Joi.string().min(3).lowercase().max(40).optional(),
+    middleName: Joi.string().min(1).lowercase().max(40).optional(),
     email: Joi.string().email().lowercase().required().messages({
       'string.email': 'Oops!, you need to provide valid email address',
       'string.required': 'Oops!, you have to specify an email address',
@@ -247,7 +247,7 @@ export const updateAdmin = {
   body: Joi.object().keys({
     firstName: Joi.string().min(3).lowercase().max(40).optional(),
     lastName: Joi.string().min(3).lowercase().max(40).optional(),
-    middleName: Joi.string().min(3).lowercase().max(40).optional(),
+    middleName: Joi.string().min(1).lowercase().max(40).optional(),
     email: Joi.string().email().lowercase().optional().messages({
       'string.email': 'Oops!, you need to provide valid email address',
       'string.optional': 'Oops!, you have to specify an email address',
