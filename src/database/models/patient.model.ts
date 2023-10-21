@@ -71,6 +71,13 @@ const patientSchema = new Schema<Patient>(
       enum: Object.values(GENDER),
     },
     avatar: String,
+    location: {
+      latitude: Number,
+      longitude: Number,
+      state: String,
+      country: { type: String, default: 'Nigeria' },
+      address: String,
+    },
     // dob: {
     //   type: Date,
     //   required: false,
