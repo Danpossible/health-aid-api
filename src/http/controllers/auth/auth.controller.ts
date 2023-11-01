@@ -145,12 +145,14 @@ export default class PatientAuth {
       user = await Patient.findOne({
         email: req.body.email,
       }).select('+password');
+
       if (!user) {
         user = await HealthWorker.findOne({
           email: req.body.email,
         }).select('+password');
         if (!user) throw new Error('Oops! invalid login credentials');
       }
+      
       if (
         !(await this.encryptionService.comparePassword(
           user.password,
