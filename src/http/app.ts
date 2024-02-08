@@ -51,7 +51,7 @@ const createServer = async () => {
       max: 20, // limit each IP to 100 requests per windowMs
       skipSuccessfulRequests: true,
       keyGenerator: (req) => getClientIP(req), // Use the custom function to get the IP
-      message: 'Too many requests from this IP, please try again in an 15mins!',
+      message: 'Too many requests from this IP, please try again in an 15mins!.. thank you',
     });
     app.use('/api', limiter);
   }
